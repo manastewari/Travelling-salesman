@@ -1,0 +1,73 @@
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Random;
+
+public class TSP {
+
+    private static final int CITY_COUNT = 5;
+    private static final int POPULATION_SIZE = 20;
+    private static final int GENERATIONS = 50;
+    private static final double MUTATION_RATE = 0.1;
+    private static final Random random = new Random();
+
+    public static void main(String[] args) {
+        ArrayList<ArrayList<Integer>> population = initializePopulation(POPULATION_SIZE);
+        for (int generation = 0; generation < GENERATIONS; generation++) {
+            ArrayList<ArrayList<Integer>> newGeneration = new ArrayList<>();
+            while (newGeneration.size() < POPULATION_SIZE) {
+                // Selection (simply select random individuals for crossover)
+                ArrayList<Integer> parent1 = population.get(random.nextInt(population.size()));
+                ArrayList<Integer> parent2 = population.get(random.nextInt(population.size()));
+                // Crossover
+                ArrayList<Integer> child = crossover(parent1, parent2);
+                // Mutation
+                mutate(child, MUTATION_RATE);
+                newGeneration.add(child);
+            }
+            population = newGeneration;
+            // Optionally, print best fitness of the generation
+            System.out.println("Generation " + generation + ": Best Distance = " + calculateDistance(population.get(0)));
+        }
+    }
+
+    private static ArrayList<ArrayList<Integer>> initializePopulation(int size) {
+        ArrayList<ArrayList<Integer>> population = new ArrayList<>();
+        ArrayList<Integer> initialPath = new ArrayList<>();
+        for (int i = 0; i < CITY_COUNT; i++) {
+            initialPath.add(i);
+        }
+        for (int i = 0; i < size; i++) {
+            ArrayList<Integer> newPath = new ArrayList<>(initialPath);
+            Collections.shuffle(newPath);
+            population.add(newPath);
+        }
+        return population;
+    }
+
+    private static ArrayList<Integer> crossover(ArrayList<Integer> parent1, ArrayList<Integer> parent2) {
+       
+        int crossoverPoint = random.nextInt(CITY_COUNT);
+        ArrayList<Integer> child = new ArrayList<>(parent1.subList(0, crossoverPoint));
+        parent2.forEach(city -> {
+            if (!child.contains(city)) {
+                child.add(city);
+            }
+        });
+        return child;
+    }
+
+    private static void mutate(ArrayList<Integer> path, double mutationRate) {
+        // Simple swap mutation
+        if (random.nextDouble() < mutationRate) {
+            int index1 = random.nextInt(path.size());
+            int index2 = random.nextInt(path.size());
+            Collections.swap(path, index1, index2);
+        }
+    }
+
+    private static int calculateDistance(ArrayList<Integer> path) {
+        
+        return path.size(); // Simplification for demonstration purposes
+    }
+}
